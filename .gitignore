@@ -1,2 +1,7 @@
-/builddir
-/generated
+.cache
+.vscode
+
+builddir
+build
+
+generated
