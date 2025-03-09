@@ -1,20 +1,25 @@
 project('gtkwidgetspp', [ 'cpp', 'c' ], default_options : ['c_std=c23', 'cpp_std=c++23'])
 
-run_command(
-    meson.current_source_dir() + '/gdbus-codegen-glibmm/gdbus-codegen-glibmm.py',
-    '--generate-cpp-code=' + meson.current_source_dir() + '/generated/status-notifier-watcher-interface',
-    meson.current_source_dir() + '/data/introspect/org.kde.StatusNotifierWatcher.xml',
-    check: true
-)
+fs = import('fs')
 
-run_command(
-    meson.current_source_dir() + '/gdbus-codegen-glibmm/gdbus-codegen-glibmm.py',
-    '--generate-cpp-code=' + meson.current_source_dir() + '/generated/status-notifier-item-interface',
-    meson.current_source_dir() + '/data/introspect/org.kde.StatusNotifierItem.xml',
-    check: true
-)
+if(fs.exists('generated') != true)
+    run_command(
+        meson.current_source_dir() + '/gdbus-codegen-glibmm/gdbus-codegen-glibmm.py',
+        '--generate-cpp-code=' + meson.current_source_dir() + '/generated/status-notifier-watcher-interface',
+        meson.current_source_dir() + '/data/introspect/org.kde.StatusNotifierWatcher.xml',
+        check: true
+    )
+
+    run_command(
+        meson.current_source_dir() + '/gdbus-codegen-glibmm/gdbus-codegen-glibmm.py',
+        '--generate-cpp-code=' + meson.current_source_dir() + '/generated/status-notifier-item-interface',
+        meson.current_source_dir() + '/data/introspect/org.kde.StatusNotifierItem.xml',
+        check: true
+    )
+endif
 
 inc = include_directories('generated', 'include')
+
 libgtkwidgetspp = static_library(
     'gtkwidgetspp',
     sources: [
@@ -66,6 +71,8 @@ libgtkwidgetspp = static_library(
 )
 
 libgtkwidgetspp_dep = declare_dependency(
+    include_directories : inc,
+
     link_with : libgtkwidgetspp,
     dependencies: [
         dependency('gtk4'),

@@ -2,23 +2,14 @@
 
 #include <fmt/format.h>
 #include <gtkmm-4.0/gtkmm.h>
-#include <status-notifier-item-interface_stub.h>
 #include <status-notifier-watcher-interface_stub.h>
+#include <status-notifier-item-interface_proxy.h>
 
 #include <Utils/GLibUtil.hpp>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "giomm/dbusconnection.h"
-#include "giomm/dbusmenumodel.h"
-#include "glibmm/object.h"
-#include "glibmm/objectbase.h"
-#include "glibmm/refptr.h"
-#include "glibmm/ustring.h"
-#include "glibmm/value.h"
-#include "status-notifier-item-interface_proxy.h"
 
 class TrayItem : public org::kde::StatusNotifierItemProxy, virtual Glib::Object {
 protected:
@@ -110,17 +101,18 @@ private:
         void on_item_unregistered(std::string path);
 
     public:
-        Watcher();
         ~Watcher();
+        Watcher();
     };
 
     std::map<TrayItem*, std::string> pathLookups;
     Watcher _watcher;
 
     Service();
-    ~Service();
 
 public:
+    ~Service();
+
     static Service* getInstance();
     static void closeInstance();
 
