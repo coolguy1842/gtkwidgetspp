@@ -16,6 +16,13 @@ if(fs.exists('generated') != true)
         meson.current_source_dir() + '/data/introspect/org.kde.StatusNotifierItem.xml',
         check: true
     )
+
+    run_command(
+        meson.current_source_dir() + '/gdbus-codegen-glibmm/gdbus-codegen-glibmm.py',
+        '--generate-cpp-code=' + meson.current_source_dir() + '/generated/dbusmenu-interface',
+        meson.current_source_dir() + '/data/introspect/com.canonical.dbusmenu.xml',
+        check: true
+    )
 endif
 
 inc = include_directories('generated', 'include')
@@ -30,7 +37,11 @@ libgtkwidgetspp = static_library(
 
             'generated/status-notifier-watcher-interface_common.cpp',
             'generated/status-notifier-watcher-interface_proxy.cpp',
-            'generated/status-notifier-watcher-interface_stub.cpp'
+            'generated/status-notifier-watcher-interface_stub.cpp',
+
+            'generated/dbusmenu-interface_common.cpp',
+            'generated/dbusmenu-interface_proxy.cpp',
+            'generated/dbusmenu-interface_stub.cpp'
         ),
         files(
             'src/Utils/CSSUtil.cpp',
@@ -54,9 +65,9 @@ libgtkwidgetspp = static_library(
             'src/Services/Hyprservice/event.cpp',
             'src/Services/Hyprservice/service.cpp',
 
-            'src/Services/Trayservice/dbus/trayItem.cpp',
-            'src/Services/Trayservice/dbus/statusNotifierWatcher.cpp',
-            'src/Services/Trayservice/dbus/watcher.cpp',
+            'src/Services/Trayservice/trayItem.cpp',
+            'src/Services/Trayservice/statusNotifierWatcher.cpp',
+            'src/Services/Trayservice/watcher.cpp',
             'src/Services/Trayservice/service.cpp'
         )
     ],
@@ -66,7 +77,7 @@ libgtkwidgetspp = static_library(
         dependency('gtk4'),
         dependency('gtkmm-4.0'),
         dependency('gtk4-layer-shell-0'),
-        dependency('nlohmann_json'),
+        dependency('nlohmann_json')
     ]
 )
 
