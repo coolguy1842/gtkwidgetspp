@@ -8,8 +8,6 @@ void Services::Tray::Service::Watcher::on_item_registered(std::string path) {
     std::string busName    = path.substr(0, it);
     std::string objectPath = path.substr(it);
 
-    printf("busName: %s, objectPath: %s\n", busName.c_str(), objectPath.c_str());
-
     auto proxy = TrayItem::createForBus_sync(
         Gio::DBus::BusType::SESSION,
         Gio::DBus::ProxyFlags::NONE,
@@ -58,9 +56,8 @@ Services::Tray::Service::Watcher::Watcher()
     uint32_t owner_id = Gio::DBus::own_name(
         Gio::DBus::BusType::SESSION,
         "org.kde.StatusNotifierWatcher",
-        [&](const Glib::RefPtr<Gio::DBus::Connection>& con, Glib::ustring name) {},
         [&](const Glib::RefPtr<Gio::DBus::Connection>& con, Glib::ustring name) {
-            printf("name acquired on %s\n", name.c_str());
+            printf("bus acquired on %s\n", name.c_str());
 
             if(_watcher.register_object(con, "/StatusNotifierWatcher") == 0) {
                 printf("ERROR: Failed to register object on /StatusNotifierWatcher\n");
@@ -71,6 +68,7 @@ Services::Tray::Service::Watcher::Watcher()
                 printf("successfully registered object\n");
             }
         },
+        [&](const Glib::RefPtr<Gio::DBus::Connection>& con, Glib::ustring name) {},
         [&](const Glib::RefPtr<Gio::DBus::Connection>& con, Glib::ustring name) {
             printf("ERROR: Lost name for %s\n", name.c_str());
         },

@@ -90,14 +90,11 @@ libgtkwidgetspp = static_library(
 
 libgtkwidgetspp_dep = declare_dependency(
     include_directories: libgtkwidgetspp_include,
-    link_with : libgtkwidgetspp,
+    link_with : [ libgtkwidgetspp, libdbusmenugtk4_lib ],
     dependencies: [
         dependency('gtk4'),
         dependency('gtkmm-4.0'),
         dependency('gtk4-layer-shell-0'),
         dependency('nlohmann_json')
-    ],
-    link_with : [
-        libdbusmenugtk4_lib
     ]
 )

@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 
+namespace Services::Tray {
+
 class TrayItem : public org::kde::StatusNotifierItemProxy, virtual Glib::Object {
     MAKE_SIGNAL(icon, void);
     MAKE_SIGNAL(menu, void);
@@ -39,7 +41,6 @@ public:
 
     std::string getID();
     std::string getTitle();
-    Glib::RefPtr<Gio::Menu> getMenu();
 
     std::variant<std::string, Glib::RefPtr<Gdk::Pixbuf>, Glib::RefPtr<Gtk::IconPaintable>> getIcon();
 
@@ -130,17 +131,10 @@ public:
     static Service* getInstance();
     static void closeInstance();
 
-    Watcher::type_signal_item_registered signal_item_registered() {
-        return _watcher.signal_item_registered();
-    }
-    Watcher::type_signal_item_registered signal_item_unregistered() {
-        return _watcher.signal_item_unregistered();
-    }
+    Watcher::type_signal_item_registered signal_item_registered() { return _watcher.signal_item_registered(); }
+    Watcher::type_signal_item_registered signal_item_unregistered() { return _watcher.signal_item_unregistered(); }
 
-    Glib::PropertyProxy<std::vector<Glib::RefPtr<TrayItem>>> property_items() {
-        return _watcher.property_items();
-    }
-    std::vector<Glib::RefPtr<TrayItem>> get_items() {
-        return _watcher.get_items();
-    }
+    Glib::PropertyProxy<std::vector<Glib::RefPtr<TrayItem>>> property_items() { return _watcher.property_items(); }
+    std::vector<Glib::RefPtr<TrayItem>> get_items() { return _watcher.get_items(); }
+};
 };  // namespace Services::Tray
