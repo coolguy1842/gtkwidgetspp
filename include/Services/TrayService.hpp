@@ -56,8 +56,7 @@ public:
         );
     }
 
-    static Glib::RefPtr<TrayItem>
-    createForBusFinish(const Glib::RefPtr<Gio::AsyncResult>& result) {
+    static Glib::RefPtr<TrayItem> createForBusFinish(const Glib::RefPtr<Gio::AsyncResult>& result) {
         Glib::RefPtr<Gio::DBus::Proxy> proxy =
             Gio::DBus::Proxy::create_for_bus_finish(result);
         TrayItem* p = new TrayItem(proxy);
@@ -65,8 +64,7 @@ public:
         return Glib::RefPtr<TrayItem>(p);
     }
 
-    static Glib::RefPtr<TrayItem>
-    createForBus_sync(Gio::DBus::BusType busType, Gio::DBus::ProxyFlags proxyFlags, const std::string& name, const std::string& objectPath, const Glib::RefPtr<Gio::Cancellable>& cancellable) {
+    static Glib::RefPtr<TrayItem> createForBus_sync(Gio::DBus::BusType busType, Gio::DBus::ProxyFlags proxyFlags, const std::string& name, const std::string& objectPath, const Glib::RefPtr<Gio::Cancellable>& cancellable) {
         Glib::RefPtr<Gio::DBus::Proxy> proxy =
             Gio::DBus::Proxy::create_for_bus_sync(
                 busType, name, objectPath, "org.kde.StatusNotifierItem",
@@ -110,6 +108,7 @@ private:
 
         StatusNotifierWatcher _watcher;
         std::map<std::string, TrayItem*> _pathLookups;
+        std::mutex registerMutex;
 
     private:
         void on_item_registered(std::string path);

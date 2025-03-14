@@ -2,32 +2,33 @@
 #include <algorithm>
 
 void Services::Tray::Service::Watcher::on_item_registered(std::string path) {
-    printf("%s registered\n", path.c_str());
-
     auto it                = path.find_first_of('/');
     std::string busName    = path.substr(0, it);
     std::string objectPath = path.substr(it);
 
-    auto proxy = TrayItem::createForBus_sync(
+    TrayItem::createForBus(
         Gio::DBus::BusType::SESSION,
         Gio::DBus::ProxyFlags::NONE,
         busName,
         objectPath,
+        [this, path](const Glib::RefPtr<Gio::AsyncResult>& res) {
+            auto proxy = TrayItem::createForBusFinish(res);
+
+            registerMutex.lock();
+            _pathLookups[path] = proxy.get();
+
+            auto items = get_items();
+            items.push_back(proxy);
+
+            _property_items.set_value(items);
+            _signal_item_registered.emit(proxy);
+            registerMutex.unlock();
+        },
         nullptr
     );
-
-    _pathLookups[path] = proxy.get();
-
-    auto items = get_items();
-    items.push_back(proxy);
-
-    _property_items.set_value(items);
-    _signal_item_registered.emit(proxy);
 }
 
 void Services::Tray::Service::Watcher::on_item_unregistered(std::string path) {
-    printf("%s unregistered\n", path.c_str());
-
     TrayItem* proxy = _pathLookups[path];
     if(proxy == nullptr) {
         return;
@@ -65,7 +66,7 @@ Services::Tray::Service::Watcher::Watcher()
                 Gio::DBus::unown_name(owner_id);
             }
             else {
-                printf("successfully registered object\n");
+                printf("successfully registered to object /StatusNotifierWatcher\n");
             }
         },
         [&](const Glib::RefPtr<Gio::DBus::Connection>& con, Glib::ustring name) {},
