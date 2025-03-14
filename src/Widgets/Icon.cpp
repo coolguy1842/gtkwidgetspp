@@ -46,3 +46,9 @@ Widgets::Icon::Icon(IconProps props)
     , _props(props) {}
 
 Widgets::Icon::~Icon() {}
+
+
+void Widgets::Icon::setIcon(std::variant<std::string, Glib::RefPtr<Gdk::Pixbuf>, Glib::RefPtr<Gtk::IconPaintable>> icon) {
+    _props.icon = icon;
+    applyIcon();
+}

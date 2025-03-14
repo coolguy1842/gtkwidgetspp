@@ -42,6 +42,8 @@ public:
     // dont call manually
     void __init();
     virtual ~Icon();
+
+    void setIcon(std::variant<std::string, Glib::RefPtr<Gdk::Pixbuf>, Glib::RefPtr<Gtk::IconPaintable>> icon);
 };
 
 };  // namespace Widgets

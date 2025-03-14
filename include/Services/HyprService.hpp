@@ -59,10 +59,10 @@ struct Monitor : public Glib::Object {
     Monitor();
 
 public:
+    ~Monitor();
+
     static Monitor* createFromJSON(nlohmann::json json);
     void updateFromJSON(nlohmann::json json);
-
-    ~Monitor();
 
     Gdk::Monitor* getGDKMonitor();
 };

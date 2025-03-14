@@ -1,5 +1,6 @@
 #pragma once
 
+#include <dbusmenu-interface_proxy.h>
 #include <fmt/format.h>
 #include <gtkmm-4.0/gtkmm.h>
 #include <status-notifier-item-interface_proxy.h>
@@ -11,9 +12,23 @@
 #include <string>
 
 class TrayItem : public org::kde::StatusNotifierItemProxy, virtual Glib::Object {
+    MAKE_SIGNAL(icon, void);
+    MAKE_SIGNAL(menu, void);
+
 protected:
     Glib::RefPtr<libdbusmenu::Menu> _menu;
     Glib::RefPtr<Gio::DBus::Connection> _connection;
+
+    Glib::RefPtr<Gtk::IconTheme> _iconTheme;
+    std::variant<std::string, Glib::RefPtr<Gdk::Pixbuf>, Glib::RefPtr<Gtk::IconPaintable>> _icon;
+
+    void loadMenuLayout(Gio::Menu* model, std::tuple<gint32, std::map<Glib::ustring, Glib::VariantBase>, std::vector<Glib::VariantBase>> layout);
+    Glib::RefPtr<Gdk::Pixbuf> loadPixmap(std::vector<std::tuple<int, int, std::vector<guint8>>> pixmap);
+
+    void reloadIconTheme();
+    void reloadIcon();
+
+    void handle_properties_changed(const Gio::DBus::Proxy::MapChangedProperties& changed_properties, const std::vector<Glib::ustring>& invalidated_properties);
 
     TrayItem(Glib::RefPtr<Gio::DBus::Proxy> proxy);
 
@@ -24,8 +39,9 @@ public:
 
     std::string getID();
     std::string getTitle();
-    std::string getIconName();
-    std::string getIconThemePath();
+    Glib::RefPtr<Gio::Menu> getMenu();
+
+    std::variant<std::string, Glib::RefPtr<Gdk::Pixbuf>, Glib::RefPtr<Gtk::IconPaintable>> getIcon();
 
     Glib::RefPtr<libdbusmenu::Menu> getMenuModel();
     Glib::RefPtr<Gtk::PopoverMenu> getMenuWidget();
@@ -83,8 +99,6 @@ public:
     gint32 ProtocolVersion_get();
 };
 
-namespace Services::Tray {
-
 class Service : public Glib::Object {
 private:
     class Watcher : public Glib::Object {
@@ -101,17 +115,18 @@ private:
         void on_item_unregistered(std::string path);
 
     public:
-        Watcher();
         ~Watcher();
+        Watcher();
     };
 
     std::map<TrayItem*, std::string> pathLookups;
     Watcher _watcher;
 
     Service();
-    ~Service();
 
 public:
+    ~Service();
+
     static Service* getInstance();
     static void closeInstance();
 
@@ -128,6 +143,4 @@ public:
     std::vector<Glib::RefPtr<TrayItem>> get_items() {
         return _watcher.get_items();
     }
-};
-
 };  // namespace Services::Tray
