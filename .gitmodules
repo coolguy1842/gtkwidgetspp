@@ -1,3 +1,6 @@
 [submodule "gdbus-codegen-glibmm"]
 	path = gdbus-codegen-glibmm
 	url = https://github.com/coolguy1842/gdbus-codegen-glibmm
+[submodule "subprojects/libdbusmenugtk4"]
+	path = subprojects/libdbusmenugtk4
+	url = https://github.com/coolguy1842/libdbusmenugtk4

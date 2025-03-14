@@ -5,3 +5,5 @@ builddir
 build
 
 generated
+
+compile_commands.json

@@ -1,6 +1,7 @@
 #include <Services/TrayService.hpp>
 #include <vector>
 
+#include "DBusMenu.hpp"
 #include "giomm/asyncresult.h"
 #include "giomm/dbusconnection.h"
 #include "glibmm/objectbase.h"
@@ -9,6 +10,7 @@
 #include "glibmm/variant.h"
 #include "glibmm/variantiter.h"
 #include "glibmm/varianttype.h"
+#include "gtkmm/popovermenu.h"
 
 TrayItem::~TrayItem() {}
 TrayItem::TrayItem(Glib::RefPtr<Gio::DBus::Proxy> proxy)
@@ -21,6 +23,14 @@ std::string TrayItem::getID() { return Id_get(); }
 std::string TrayItem::getTitle() { return Title_get(); }
 std::string TrayItem::getIconName() { return IconName_get(); }
 std::string TrayItem::getIconThemePath() { return IconThemePath_get(); }
+
+Glib::RefPtr<libdbusmenu::Menu> TrayItem::getMenuModel() { return _menu; }
+Glib::RefPtr<Gtk::PopoverMenu> TrayItem::getMenuWidget() {
+    auto popover = Glib::make_refptr_for_instance(new Gtk::PopoverMenu(_menu));
+    popover->insert_action_group(_menu->get_actionGroupPrefix(), _menu->get_actionGroup());
+
+    return popover;
+}
 
 void TrayItem::resetProperties() {
     dbusProxy()->get_connection()->call(

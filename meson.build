@@ -14,7 +14,12 @@ run_command(
     check: true
 )
 
-inc = include_directories('generated', 'include')
+libdbusmenugtk4_proj = subproject('libdbusmenugtk4')
+libdbusmenugtk4_include = libdbusmenugtk4_proj.get_variable('libdbusmenugtk4_include')
+libdbusmenugtk4_lib = libdbusmenugtk4_proj.get_variable('libdbusmenugtk4')
+
+
+libgtkwidgetspp_include = [ include_directories('generated', 'include'), libdbusmenugtk4_include ]
 libgtkwidgetspp = static_library(
     'gtkwidgetspp',
     sources: [
@@ -55,22 +60,29 @@ libgtkwidgetspp = static_library(
             'src/Services/Trayservice/service.cpp'
         )
     ],
-    include_directories : inc,
+    include_directories : libgtkwidgetspp_include,
     install : false,
     dependencies: [
         dependency('gtk4'),
         dependency('gtkmm-4.0'),
         dependency('gtk4-layer-shell-0'),
-        dependency('nlohmann_json'),
+        dependency('nlohmann_json')
+    ],
+    link_with: [
+        libdbusmenugtk4_lib
     ]
 )
 
 libgtkwidgetspp_dep = declare_dependency(
+    include_directories: libgtkwidgetspp_include,
     link_with : libgtkwidgetspp,
     dependencies: [
         dependency('gtk4'),
         dependency('gtkmm-4.0'),
         dependency('gtk4-layer-shell-0'),
-        dependency('nlohmann_json'),
+        dependency('nlohmann_json')
+    ],
+    link_with : [
+        libdbusmenugtk4_lib
     ]
 )
